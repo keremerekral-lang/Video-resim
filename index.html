@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#080810">
+<title>Video Çözüm</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+:root{
+  --bg:#080810;
+  --s1:#0f0f1a;
+  --s2:#16162a;
+  --s3:#1e1e35;
+  --border:#2a2a45;
+  --accent:#7c6fff;
+  --accent2:#ff6b9d;
+  --gold:#ffd166;
+  --text:#f0edf8;
+  --muted:#6a6a9a;
+  --success:#06d6a0;
+  --danger:#ff5566;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* BG */
+body::before{
+  content:'';
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%,rgba(124,111,255,.08) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 100%,rgba(255,107,157,.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+
+/* HEADER */
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,8,16,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(124,111,255,.15);
+  height:62px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;
+}
+
+.logo{
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.logo-icon{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  box-shadow:0 0 20px rgba(124,111,255,.4);
+  transition:transform .2s;
+}
+.logo:active .logo-icon{transform:scale(.9);}
+.logo-text{font-size:1.15rem;font-weight:800;letter-spacing:-.02em;}
+.logo-text span{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+/* CLICK DOTS */
+.logo-clicks{
+  display:flex;gap:3px;align-items:center;margin-left:2px;
+}
+.logo-clicks .dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--accent);opacity:0;
+  transition:opacity .2s;
+}
+.logo-clicks .dot.lit{opacity:1;}
+
+/* MAIN CONTENT */
+.wrap{position:relative;z-index:1;}
+.view{display:none;}.view.active{display:block;}
+.page{max-width:1060px;margin:0 auto;padding:2.5rem 1.25rem;}
+
+/* BREADCRUMB */
+.bc{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);margin-bottom:2rem;flex-wrap:wrap;}
+.bc span{cursor:pointer;transition:color .15s;}.bc span:hover{color:var(--text);}
+.bc span.cur{color:var(--text);font-weight:600;}
+.bc-sep{opacity:.35;}
+
+/* HERO */
+.hero{text-align:center;padding:3rem 0 2.5rem;animation:fadeUp .6s both;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--accent);
+  background:rgba(124,111,255,.1);border:1px solid rgba(124,111,255,.25);
+  padding:.3rem .9rem;border-radius:100px;margin-bottom:1.25rem;
+}
+.hero h1{
+  font-size:clamp(2rem,5vw,3.2rem);font-weight:900;
+  letter-spacing:-.03em;line-height:1.05;margin-bottom:.9rem;
+}
+.hero h1 .grad{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{color:var(--muted);font-size:1rem;max-width:460px;margin:0 auto;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* GRID */
+.section-title{font-size:1rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.25rem;}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:2.5rem;}
+.card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:1.4rem 1.5rem;
+  cursor:pointer;
+  transition:all .25s;
+  position:relative;overflow:hidden;
+  animation:fadeUp .5s both;
+}
+.card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(124,111,255,.06),rgba(255,107,157,.04));
+  opacity:0;transition:opacity .25s;
+}
+.card:hover{border-color:rgba(124,111,255,.5);transform:translateY(-3px);box-shadow:0 12px 40px rgba(124,111,255,.12);}
+.card:hover::after{opacity:1;}
+.card-emoji{font-size:1.8rem;margin-bottom:.7rem;display:block;}
+.card-name{font-size:1rem;font-weight:700;margin-bottom:.3rem;}
+.card-desc{font-size:.78rem;color:var(--muted);margin-bottom:.6rem;}
+.card-meta{font-size:.74rem;color:var(--accent);font-weight:600;}
+
+/* PILLS */
+.pills{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.75rem;}
+.pill{
+  padding:.48rem 1.1rem;border-radius:100px;font-size:.84rem;font-weight:500;
+  border:1px solid var(--border);background:var(--s1);color:var(--muted);
+  cursor:pointer;transition:all .18s;
+}
+.pill:hover{color:var(--text);border-color:var(--muted);}
+.pill.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-color:transparent;color:#fff;font-weight:700;
+  box-shadow:0 4px 16px rgba(124,111,255,.3);
+}
+
+/* NUM GRID */
+.num-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:.6rem;margin-bottom:2rem;}
+.num-card{
+  background:var(--s1);border:1px solid var(--border);border-radius:12px;
+  padding:.9rem .4rem;cursor:pointer;transition:all .2s;text-align:center;
+}
+.num-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(124,111,255,.1);}
+.num-card.active{
+  background:linear-gradient(135deg,rgba(124,111,255,.15),rgba(255,107,157,.1));
+  border-color:var(--accent);
+}
+.num-card .n{font-size:1.15rem;font-weight:800;}
+.num-card .lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem;}
+
+/* VIDEO BOX */
+.vbox{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;margin-bottom:2rem;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+  animation:fadeUp .4s both;
+}
+.vbox-head{
+  padding:1rem 1.4rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+  background:var(--s2);
+}
+.vbox-title{font-weight:700;font-size:.95rem;}
+.vbadge{
+  font-size:.7rem;font-weight:700;padding:.2rem .7rem;border-radius:100px;
+  background:rgba(124,111,255,.12);border:1px solid rgba(124,111,255,.3);color:var(--accent);
+}
+.vframe{position:relative;padding-bottom:56.25%;background:#000;}
+.vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.vfoot{
+  padding:.9rem 1.4rem;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;
+  background:var(--s2);
+}
+.vfoot-note{font-size:.78rem;color:var(--muted);}
+.btn-yt{
+  background:#ff0000;color:#fff;font-weight:700;font-size:.88rem;
+  padding:.55rem 1.2rem;border-radius:10px;
+  display:inline-flex;align-items:center;gap:7px;
+  text-decoration:none;transition:all .18s;
+}
+.btn-yt:hover{filter:brightness(1.1);transform:translateY(-1px);}
+
+/* EMPTY */
+.empty{text-align:center;padding:4rem 1rem;color:var(--muted);}
+.empty-icon{font-size:3rem;margin-bottom:.8rem;opacity:.3;}
+
+/* FOOTER */
+footer{
+  text-align:center;padding:2.5rem 1rem;
+  border-top:1px solid var(--border);
+  color:var(--muted);font-size:.8rem;
+  position:relative;z-index:1;margin-top:3rem;
+}
+footer .made{font-weight:700;color:var(--text);}
+footer .brand{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  font-weight:800;
+}
+
+/* BUTTONS */
+.btn{font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:600;padding:.46rem 1rem;border-radius:10px;border:none;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;box-shadow:0 4px 16px rgba(124,111,255,.3);}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-success{background:var(--success);color:#080810;font-weight:700;}
+.btn-success:hover{filter:brightness(1.08);}
+.btn-danger{background:rgba(255,85,85,.1);color:var(--danger);border:1px solid rgba(255,85,85,.25);}
+.btn-danger:hover{background:rgba(255,85,85,.2);}
+
+/* ADMIN */
+.admin-wrap{max-width:800px;margin:0 auto;padding:2rem 1.25rem;}
+.admin-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.75rem;padding-bottom:1.25rem;
+  border-bottom:1px solid var(--border);
+}
+.admin-head h2{font-size:1.5rem;font-weight:800;}
+.abadge{
+  font-size:.68rem;font-weight:700;padding:.2rem .7rem;border-radius:100px;
+  background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);
+  color:var(--gold);text-transform:uppercase;letter-spacing:.08em;
+}
+
+.tabs{display:flex;gap:.35rem;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:.35rem;margin-bottom:1.5rem;}
+.tab{flex:1;padding:.52rem;border-radius:9px;border:none;background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .18s;}
+.tab.active{background:var(--s2);color:var(--text);border:1px solid var(--border);font-weight:600;}
+.tab-c{display:none;}.tab-c.active{display:block;}
+
+.fc{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1.1rem;}
+.fc-title{font-weight:700;font-size:.92rem;margin-bottom:1.15rem;display:flex;align-items:center;gap:8px;}
+.fc-title::before{content:'';width:3px;height:16px;background:linear-gradient(var(--accent),var(--accent2));border-radius:2px;}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:.85rem;}
+.row.full{grid-template-columns:1fr;}
+.fg{display:flex;flex-direction:column;gap:.35rem;}
+label{font-size:.73rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;}
+input,select{
+  background:var(--s2);border:1px solid var(--border);border-radius:9px;
+  padding:.6rem .9rem;color:var(--text);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;
+  transition:border-color .18s,box-shadow .18s;width:100%;
+}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,111,255,.1);}
+select option{background:var(--s2);}
+.form-actions{display:flex;gap:.6rem;margin-top:1.1rem;}
+
+.mitem{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:.85rem 1.1rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;transition:border-color .18s;}
+.mitem:hover{border-color:var(--border);}
+.mitem-info{flex:1;min-width:0;}
+.mitem-name{font-weight:700;font-size:.88rem;margin-bottom:.2rem;}
+.mitem-sub{font-size:.74rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.tip{background:rgba(124,111,255,.06);border:1px solid rgba(124,111,255,.18);border-radius:11px;padding:.9rem 1.1rem;font-size:.82rem;color:var(--muted);line-height:1.65;}
+.tip strong{color:var(--text);}
+
+/* PW OVERLAY */
+.pw-overlay{position:fixed;inset:0;background:rgba(8,8,16,.97);backdrop-filter:blur(20px);z-index:300;display:flex;align-items:center;justify-content:center;}
+.pw-box{
+  background:var(--s1);border:1px solid var(--border);border-radius:20px;
+  padding:2.25rem;width:100%;max-width:360px;text-align:center;
+  box-shadow:0 40px 80px rgba(0,0,0,.5);
+  animation:fadeUp .35s both;
+}
+.pw-icon{
+  width:56px;height:56px;border-radius:16px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;margin:0 auto 1rem;
+  box-shadow:0 8px 24px rgba(124,111,255,.4);
+}
+.pw-box h2{font-size:1.3rem;font-weight:800;margin-bottom:.35rem;}
+.pw-box p{color:var(--muted);font-size:.85rem;margin-bottom:1.25rem;}
+.pw-row{display:flex;gap:.5rem;}
+.pw-err{color:var(--danger);font-size:.78rem;margin-top:.4rem;display:none;}
+
+/* NOTIF */
+.notif{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:400;
+  padding:.65rem 1.2rem;border-radius:11px;font-weight:700;font-size:.84rem;
+  transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+.notif.show{transform:translateY(0);opacity:1;}
+
+.loader{text-align:center;padding:4rem;color:var(--muted);font-size:.9rem;}
+.loader-spin{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:540px){
+  .row{grid-template-columns:1fr;}
+  .card-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+  .num-grid{grid-template-columns:repeat(auto-fill,minmax(62px,1fr));}
+  header{padding:0 1rem;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" id="logoBtn">
+    <div class="logo-icon">▶</div>
+    <span class="logo-text" id="siteNameDisplay">Video <span>Çözüm</span></span>
+    <div class="logo-clicks" id="logoClicks">
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+      <div class="dot" id="d4"></div>
+      <div class="dot" id="d5"></div>
+    </div>
+  </div>
+</header>
+
+<div class="pw-overlay" id="pwOverlay" style="display:none">
+  <div class="pw-box">
+    <div class="pw-icon">🔐</div>
+    <h2>Admin Girişi</h2>
+    <p>Şifreyi girin</p>
+    <div class="pw-row">
+      <input type="password" id="pwIn" placeholder="Şifre..." onkeydown="if(event.key==='Enter')checkPw()">
+      <button class="btn btn-primary" onclick="checkPw()">Gir</button>
+    </div>
+    <div class="pw-err" id="pwErr">❌ Yanlış şifre</div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:.8rem" onclick="document.getElementById('pwOverlay').style.display='none'">Vazgeç</button>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<div class="wrap">
+
+<!-- STUDENT -->
+<div class="view active" id="view-student">
+  <div class="page">
+    <div class="bc" id="bc"></div>
+
+    <div id="level-home">
+      <div class="hero">
+        <div class="hero-eyebrow">🎬 Video Çözüm Platformu</div>
+        <h1>Tüm <span class="grad">Çözümler</span><br>Tek Yerde</h1>
+        <p>Kitabını seç, bölüme git, video çözümü izle.</p>
+      </div>
+      <div class="section-title">📚 Kaynaklar</div>
+      <div class="card-grid" id="bookGrid"></div>
+      <div class="empty" id="homeEmpty" style="display:none">
+        <div class="empty-icon">📚</div>
+        <p>Henüz içerik eklenmemiş.</p>
+      </div>
+    </div>
+
+    <div id="level-book" style="display:none">
+      <div class="section-title" id="bookTitle"></div>
+      <div class="pills" id="sectionPills"></div>
+      <div class="num-grid" id="numGrid"></div>
+      <div id="videoBox" style="display:none">
+        <div class="vbox">
+          <div class="vbox-head">
+            <div class="vbox-title" id="videoTitle">Çözüm</div>
+            <span class="vbadge">📹 Video Çözüm</span>
+          </div>
+          <div class="vframe">
+            <iframe id="videoIframe" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+          </div>
+          <div class="vfoot">
+            <span class="vfoot-note">📱 Video açılmıyor mu?</span>
+            <a id="ytBtn" href="#" target="_blank" class="btn-yt">▶ YouTube'da İzle</a>
+          </div>
+        </div>
+      </div>
+      <div class="empty" id="bookEmpty" style="display:none">
+        <div class="empty-icon">📭</div><p>Bu bölüme henüz video eklenmemiş.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Yapımcı: <span class="made"><span class="brand">332merek</span></span> tarafından yapılmıştır ✦ Tüm hakları saklıdır</p>
+  </footer>
+</div>
+
+<!-- ADMIN -->
+<div class="view" id="view-admin">
+  <div class="admin-wrap">
+    <div class="admin-head">
+      <div>
+        <h2>Admin Paneli</h2>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem">Video çözüm yönetimi</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <span class="abadge">⭐ Admin</span>
+        <button class="btn btn-ghost" onclick="goHome()">← Siteye Dön</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('videos')">🎬 Video</button>
+      <button class="tab" onclick="switchTab('structure')">📚 Kitap</button>
+      <button class="tab" onclick="switchTab('manage')">📋 Liste</button>
+      <button class="tab" onclick="switchTab('settings')">⚙️ Ayar</button>
+    </div>
+
+    <div class="tab-c active" id="tab-videos">
+      <div class="fc">
+        <div class="fc-title">Tek Video Ekle</div>
+        <div class="row">
+          <div class="fg"><label>Kitap</label><select id="vBook" onchange="fillVSections()"></select></div>
+          <div class="fg"><label>Bölüm</label><select id="vSection"></select></div>
+        </div>
+        <div class="row">
+          <div class="fg"><label>Video No</label><input type="number" id="vNum" min="1" placeholder="1"></div>
+          <div class="fg"><label>Etiket</label><input type="text" id="vLabel" placeholder="Deneme 1"></div>
+        </div>
+        <div class="row full">
+          <div class="fg"><label>YouTube Linki</label><input type="url" id="vUrl" placeholder="https://youtu.be/..."></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-success" onclick="addVideo()">✓ Kaydet</button>
+          <button class="btn btn-ghost" onclick="clearVForm()">Temizle</button>
+        </div>
+      </div>
+
+      <div class="fc" style="border-color:rgba(124,111,255,.3)">
+        <div class="fc-title">⚡ Playlist'ten Toplu Ekle</div>
+        <div class="row">
+          <div class="fg"><label>Kitap</label><select id="plBook" onchange="fillPlSections()"></select></div>
+          <div class="fg"><label>Bölüm</label><select id="plSection"></select></div>
+        </div>
+        <div class="row full">
+          <div class="fg"><label>YouTube Playlist Linki</label><input type="url" id="plUrl" placeholder="https://youtube.com/playlist?list=PL..."></div>
+        </div>
+        <div class="row">
+          <div class="fg"><label>Başlangıç No</label><input type="number" id="plStart" value="1" min="1"></div>
+          <div class="fg"><label>Toplam Video</label><input type="number" id="plCount" value="19" min="1"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-success" onclick="addPlaylist()">⚡ Tümünü Ekle</button>
+        </div>
+        <div id="plProg" style="display:none;margin-top:.75rem">
+          <div style="font-size:.82rem;color:var(--muted);margin-bottom:.4rem" id="plProgText">Ekleniyor...</div>
+          <div style="height:5px;background:var(--border);border-radius:100px;overflow:hidden">
+            <div id="plProgBar" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .3s;width:0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="tip">💡 <strong>Hızlı ekleme:</strong> Kaydet'ten sonra numara otomatik 1 artar. Sadece linki değiştir.</div>
+    </div>
+
+    <div class="tab-c" id="tab-structure">
+      <div class="fc">
+        <div class="fc-title">📚 Kitap Ekle</div>
+        <div class="row">
+          <div class="fg"><label>Kitap Adı</label><input type="text" id="bName" placeholder="Ör: Barış Yayınları Geometri"></div>
+          <div class="fg"><label>Emoji</label><input type="text" id="bEmoji" placeholder="📐" maxlength="4"></div>
+        </div>
+        <div class="row full">
+          <div class="fg"><label>Açıklama</label><input type="text" id="bDesc" placeholder="Ör: TYT Denemeleri"></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-success" onclick="addBook()">✓ Kitap Ekle</button></div>
+      </div>
+      <div class="fc">
+        <div class="fc-title">📂 Bölüm Ekle</div>
+        <div class="row">
+          <div class="fg"><label>Kitap</label><select id="secBook"></select></div>
+          <div class="fg"><label>Bölüm Adı</label><input type="text" id="secName" placeholder="Ör: Deneme 1-19"></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-success" onclick="addSection()">✓ Bölüm Ekle</button></div>
+      </div>
+      <div class="fc">
+        <div class="fc-title">Mevcut Kitaplar</div>
+        <div id="bookList"></div>
+      </div>
+    </div>
+
+    <div class="tab-c" id="tab-manage">
+      <div id="manageList"></div>
+      <div class="empty" id="manageEmpty" style="display:none"><div class="empty-icon">📭</div><p>Henüz video yok.</p></div>
+    </div>
+
+    <div class="tab-c" id="tab-settings">
+      <div class="fc">
+        <div class="fc-title">🏷️ Site Adı</div>
+        <div class="row full"><div class="fg"><label>Uygulama Adı</label><input type="text" id="siteName" placeholder="Video Çözüm"></div></div>
+        <button class="btn btn-primary" onclick="saveSiteName()">Kaydet</button>
+      </div>
+      <div class="fc">
+        <div class="fc-title">🔐 Şifre Değiştir</div>
+        <div class="row">
+          <div class="fg"><label>Yeni Şifre</label><input type="password" id="pw1"></div>
+          <div class="fg"><label>Tekrar</label><input type="password" id="pw2"></div>
+        </div>
+        <button class="btn btn-primary" onclick="changePw()">Kaydet</button>
+        <p id="pwMsg" style="font-size:.8rem;margin-top:.5rem;display:none"></p>
+      </div>
+      <div class="fc" style="border-color:rgba(255,85,85,.2)">
+        <div class="fc-title" style="color:var(--danger)">⚠️ Tüm Verileri Sil</div>
+        <p style="color:var(--muted);font-size:.84rem;margin-bottom:.9rem">Geri alınamaz.</p>
+        <button class="btn btn-danger" onclick="nukeAll()">🗑 Her Şeyi Sil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- wrap -->
+
+<script>
+const BIN_URL='https://api.jsonbin.io/v3/b/69ab462243b1c97be9bb61a0';
+const BIN_KEY='$2a$10$IEQBYLPVPwCiCvFKm9ZoGeo7pykwesuqNG96AzTxSM0NMp4TZlvxS';
+const getPw=()=>localStorage.getItem('vcz_pw')||'admin123';
+const getSiteName=()=>localStorage.getItem('vcz_sn')||'Video Çözüm';
+
+let DB={books:[],sections:[],videos:[]};
+let adminUnlocked=false;
+let activeBook=null,activeSection=null,activeNum=null;
+
+// ── LOGO 5x CLICK ──
+let logoClicks=0,logoTimer=null;
+document.getElementById('logoBtn').addEventListener('click',()=>{
+  logoClicks++;
+  document.getElementById('d'+logoClicks).classList.add('lit');
+  clearTimeout(logoTimer);
+  if(logoClicks>=5){
+    logoClicks=0;
+    [1,2,3,4,5].forEach(i=>document.getElementById('d'+i).classList.remove('lit'));
+    openAdmin();
+  } else {
+    logoTimer=setTimeout(()=>{
+      logoClicks=0;
+      [1,2,3,4,5].forEach(i=>document.getElementById('d'+i).classList.remove('lit'));
+    },2000);
+  }
+});
+
+// ── API ──
+async function loadDB(){
+  try{
+    const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':BIN_KEY,'X-Bin-Meta':'false'}});
+    const d=await r.json();
+    DB=(d&&d.books)?d:{books:[],sections:[],videos:[]};
+  }catch(e){DB={books:[],sections:[],videos:[]};}
+}
+
+async function saveDB(){
+  try{
+    await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':BIN_KEY},body:JSON.stringify(DB)});
+  }catch(e){notif('⚠️ Kayıt hatası','danger');}
+}
+
+// ── INIT ──
+async function init(){
+  updateSiteNameDisplay();
+  document.getElementById('bookGrid').innerHTML='<div class="loader"><div class="loader-spin"></div><br>Yükleniyor...</div>';
+  await loadDB();
+  renderHome();
+}
+
+function updateSiteNameDisplay(){
+  const n=getSiteName();document.title=n;
+  const p=n.split(' '),last=p.pop();
+  document.getElementById('siteNameDisplay').innerHTML=(p.length?p.join(' ')+' ':'')+`<span style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">${last}</span>`;
+}
+
+// ── VIEWS ──
+function showView(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');}
+
+function goHome(){activeBook=null;activeSection=null;activeNum=null;showView('student');renderHome();}
+
+function openAdmin(){
+  if(adminUnlocked){showView('admin');switchTab('videos');fillAllSelects();return;}
+  document.getElementById('pwOverlay').style.display='flex';
+  document.getElementById('pwIn').value='';
+  document.getElementById('pwErr').style.display='none';
+  setTimeout(()=>document.getElementById('pwIn').focus(),80);
+}
+
+function checkPw(){
+  if(document.getElementById('pwIn').value===getPw()){
+    adminUnlocked=true;
+    document.getElementById('pwOverlay').style.display='none';
+    showView('admin');switchTab('videos');fillAllSelects();
+  }else{
+    document.getElementById('pwErr').style.display='block';
+    document.getElementById('pwIn').value='';
+  }
+}
+
+// ── TABS ──
+function switchTab(n){
+  const ns=['videos','structure','manage','settings'];
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',ns[i]===n));
+  document.querySelectorAll('.tab-c').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  if(n==='structure'){fillAllSelects();renderBookList();}
+  if(n==='manage')renderManage();
+  if(n==='settings')document.getElementById('siteName').value=getSiteName();
+  if(n==='videos')fillAllSelects();
+}
+
+// ── SELECTS ──
+function fillAllSelects(){
+  const opts=DB.books.length?DB.books.map(b=>`<option value="${b.id}">${b.emoji||'📚'} ${b.name}</option>`).join(''):'<option value="">— Önce kitap ekleyin —</option>';
+  ['vBook','plBook','secBook'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+  fillVSections();fillPlSections();
+}
+function fillVSections(){
+  const id=document.getElementById('vBook').value;
+  const s=DB.sections.filter(s=>s.bookId===id);
+  document.getElementById('vSection').innerHTML=s.length?s.map(s=>`<option value="${s.id}">${s.name}</option>`).join(''):'<option value="">— Bölüm ekleyin —</option>';
+}
+function fillPlSections(){
+  const el=document.getElementById('plBook');if(!el)return;
+  const id=el.value;
+  const s=DB.sections.filter(s=>s.bookId===id);
+  const pe=document.getElementById('plSection');if(!pe)return;
+  pe.innerHTML=s.length?s.map(s=>`<option value="${s.id}">${s.name}</option>`).join(''):'<option value="">— Bölüm ekleyin —</option>';
+}
+
+// ── HOME ──
+function renderHome(){
+  document.getElementById('level-home').style.display='block';
+  document.getElementById('level-book').style.display='none';
+  document.getElementById('bc').innerHTML='';
+  const grid=document.getElementById('bookGrid'),empty=document.getElementById('homeEmpty');
+  if(!DB.books.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=DB.books.map((b,i)=>{
+    const sc=DB.sections.filter(s=>s.bookId===b.id).length;
+    const vc=DB.videos.filter(v=>{const s=DB.sections.find(x=>x.id===v.sectionId);return s&&s.bookId===b.id;}).length;
+    return `<div class="card" style="animation-delay:${i*0.05}s" onclick="openBook('${b.id}')">
+      <span class="card-emoji">${b.emoji||'📚'}</span>
+      <div class="card-name">${b.name}</div>
+      <div class="card-desc">${b.desc||''}</div>
+      <div class="card-meta">${sc} bölüm · ${vc} video</div>
+    </div>`;
+  }).join('');
+}
+
+// ── BOOK LEVEL ──
+function openBook(bookId){
+  activeBook=bookId;activeSection=null;activeNum=null;
+  document.getElementById('level-home').style.display='none';
+  document.getElementById('level-book').style.display='block';
+  document.getElementById('videoBox').style.display='none';
+  renderBookLevel();
+}
+
+function renderBookLevel(){
+  const book=DB.books.find(b=>b.id===activeBook);if(!book)return;
+  document.getElementById('bc').innerHTML=`<span onclick="goHome()">🏠 Ana Sayfa</span><span class="bc-sep"> › </span><span class="cur">${book.emoji||'📚'} ${book.name}</span>`;
+  document.getElementById('bookTitle').textContent=(book.emoji||'📚')+' '+book.name;
+  const sections=DB.sections.filter(s=>s.bookId===activeBook);
+  if(!sections.length){document.getElementById('sectionPills').innerHTML='';document.getElementById('numGrid').innerHTML='';document.getElementById('bookEmpty').style.display='block';return;}
+  if(!activeSection||!sections.find(s=>s.id===activeSection))activeSection=sections[0].id;
+  document.getElementById('sectionPills').innerHTML=sections.map(s=>`<div class="pill${activeSection===s.id?' active':''}" onclick="selectSection('${s.id}')">${s.name}</div>`).join('');
+  const videos=DB.videos.filter(v=>v.sectionId===activeSection).sort((a,b)=>a.num-b.num);
+  document.getElementById('bookEmpty').style.display=videos.length?'none':'block';
+  document.getElementById('numGrid').innerHTML=videos.map(v=>`<div class="num-card${activeNum===v.num?' active':''}" onclick="selectNum(${v.num})"><div class="n">${v.num}</div><div class="lbl">${v.label||'Video'}</div></div>`).join('');
+  if(activeNum){const vd=videos.find(v=>v.num===activeNum);if(vd)showVideo(vd,book);else document.getElementById('videoBox').style.display='none';}
+}
+
+function selectSection(id){activeSection=id;activeNum=null;document.getElementById('videoBox').style.display='none';renderBookLevel();}
+function selectNum(n){activeNum=n;renderBookLevel();}
+
+function showVideo(v,book){
+  const sec=DB.sections.find(s=>s.id===v.sectionId);
+  const iframe=document.getElementById('videoIframe'),ytBtn=document.getElementById('ytBtn');
+  if(v.playlistId){
+    iframe.src=`https://www.youtube-nocookie.com/embed?listType=playlist&list=${v.playlistId}&index=${v.playlistIndex}&rel=0&playsinline=1`;
+    ytBtn.href=`https://www.youtube.com/playlist?list=${v.playlistId}`;
+  }else{
+    iframe.src=`https://www.youtube-nocookie.com/embed/${v.videoId}?rel=0&playsinline=1`;
+    ytBtn.href=`https://www.youtube.com/watch?v=${v.videoId}`;
+  }
+  document.getElementById('videoTitle').textContent=(book?book.name:'')+(sec?' › '+sec.name:'')+' › '+(v.label||'Video '+v.num);
+  document.getElementById('videoBox').style.display='block';
+  setTimeout(()=>document.getElementById('videoBox').scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+
+// ── ADD BOOK ──
+async function addBook(){
+  const name=document.getElementById('bName').value.trim();
+  if(!name)return alert('Kitap adı gerekli!');
+  DB.books.push({id:'b'+Date.now(),name,emoji:document.getElementById('bEmoji').value.trim()||'📚',desc:document.getElementById('bDesc').value.trim()});
+  await saveDB();notif('📚 Kitap eklendi');
+  document.getElementById('bName').value='';document.getElementById('bEmoji').value='';document.getElementById('bDesc').value='';
+  fillAllSelects();renderBookList();
+}
+async function deleteBook(id){
+  if(!confirm('Kitabı ve tüm içeriğini sil?'))return;
+  const sids=DB.sections.filter(s=>s.bookId===id).map(s=>s.id);
+  DB.books=DB.books.filter(b=>b.id!==id);DB.sections=DB.sections.filter(s=>s.bookId!==id);DB.videos=DB.videos.filter(v=>!sids.includes(v.sectionId));
+  await saveDB();fillAllSelects();renderBookList();notif('🗑 Silindi','danger');
+}
+
+// ── ADD SECTION ──
+async function addSection(){
+  const bookId=document.getElementById('secBook').value,name=document.getElementById('secName').value.trim();
+  if(!bookId)return alert('Kitap seçin!');if(!name)return alert('Bölüm adı gerekli!');
+  DB.sections.push({id:'s'+Date.now(),bookId,name});
+  await saveDB();notif('📂 Bölüm eklendi');
+  document.getElementById('secName').value='';fillAllSelects();renderBookList();
+}
+async function deleteSection(id){
+  if(!confirm('Bölümü ve videolarını sil?'))return;
+  DB.sections=DB.sections.filter(s=>s.id!==id);DB.videos=DB.videos.filter(v=>v.sectionId!==id);
+  await saveDB();fillAllSelects();renderBookList();notif('🗑 Silindi','danger');
+}
+
+// ── ADD VIDEO ──
+function getVid(url){try{url=url.trim();const u=new URL(url);if(u.hostname.includes('youtu.be'))return u.pathname.slice(1).split('?')[0];return u.searchParams.get('v');}catch{return null;}}
+function getPlId(url){try{return new URL(url.trim()).searchParams.get('list');}catch{return null;}}
+
+async function addVideo(){
+  const bookId=document.getElementById('vBook').value,secId=document.getElementById('vSection').value;
+  const num=parseInt(document.getElementById('vNum').value),label=document.getElementById('vLabel').value.trim(),url=document.getElementById('vUrl').value.trim();
+  if(!bookId)return alert('Kitap seçin!');if(!secId)return alert('Bölüm seçin!');
+  if(!num||num<1)return alert('Video numarası girin!');if(!url)return alert('YouTube linki girin!');
+  const vid=getVid(url);if(!vid)return alert('Geçerli YouTube linki girin!');
+  const idx=DB.videos.findIndex(v=>v.sectionId===secId&&v.num===num);
+  const entry={id:'v'+Date.now(),sectionId:secId,num,label:label||'Deneme '+num,videoId:vid};
+  if(idx>=0)DB.videos[idx]=entry;else DB.videos.push(entry);
+  await saveDB();notif('✓ Deneme '+num+' kaydedildi');
+  document.getElementById('vNum').value=num+1;document.getElementById('vLabel').value='';document.getElementById('vUrl').value='';document.getElementById('vUrl').focus();
+}
+function clearVForm(){document.getElementById('vNum').value='';document.getElementById('vLabel').value='';document.getElementById('vUrl').value='';}
+
+async function addPlaylist(){
+  const bookId=document.getElementById('plBook').value,secId=document.getElementById('plSection').value;
+  const url=document.getElementById('plUrl').value.trim(),start=parseInt(document.getElementById('plStart').value)||1,count=parseInt(document.getElementById('plCount').value)||19;
+  if(!bookId)return alert('Kitap seçin!');if(!secId)return alert('Bölüm seçin!');
+  if(!url)return alert('Playlist linki girin!');const pid=getPlId(url);if(!pid)return alert('Geçerli playlist linki girin!');
+  document.getElementById('plProg').style.display='block';
+  for(let i=0;i<count;i++){
+    const num=start+i;
+    const entry={id:'v'+Date.now()+i,sectionId:secId,num,label:'Deneme '+num,videoId:null,playlistId:pid,playlistIndex:i};
+    const idx=DB.videos.findIndex(v=>v.sectionId===secId&&v.num===num);
+    if(idx>=0)DB.videos[idx]=entry;else DB.videos.push(entry);
+    document.getElementById('plProgBar').style.width=Math.round((i+1)/count*100)+'%';
+    document.getElementById('plProgText').textContent='Ekleniyor: '+(i+1)+'/'+count;
+  }
+  await saveDB();document.getElementById('plProg').style.display='none';
+  notif('⚡ '+count+' video eklendi!');document.getElementById('plUrl').value='';
+}
+
+async function deleteVideo(id){
+  if(!confirm('Silinsin mi?'))return;
+  DB.videos=DB.videos.filter(v=>v.id!==id);await saveDB();renderManage();notif('🗑 Silindi','danger');
+}
+
+// ── RENDER LISTS ──
+function renderBookList(){
+  const el=document.getElementById('bookList');
+  if(!DB.books.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Henüz kitap yok.</p>';return;}
+  el.innerHTML=DB.books.map(b=>{
+    const secs=DB.sections.filter(s=>s.bookId===b.id);
+    return `<div style="margin-bottom:1rem">
+      <div class="mitem"><div class="mitem-info"><div class="mitem-name">${b.emoji||'📚'} ${b.name}</div><div class="mitem-sub">${b.desc||''} · ${secs.length} bölüm</div></div>
+      <button class="btn btn-danger" style="padding:.3rem .7rem;font-size:.75rem" onclick="deleteBook('${b.id}')">🗑</button></div>
+      ${secs.map(s=>`<div class="mitem" style="margin-left:1rem;margin-top:.3rem;background:var(--s2)">
+        <div class="mitem-info"><div class="mitem-name" style="font-size:.82rem">📂 ${s.name}</div><div class="mitem-sub">${DB.videos.filter(v=>v.sectionId===s.id).length} video</div></div>
+        <button class="btn btn-danger" style="padding:.3rem .7rem;font-size:.75rem" onclick="deleteSection('${s.id}')">🗑</button></div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderManage(){
+  const el=document.getElementById('manageList'),em=document.getElementById('manageEmpty');
+  if(!DB.videos.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';let html='';
+  DB.books.forEach(b=>{
+    DB.sections.filter(s=>s.bookId===b.id).forEach(s=>{
+      const vids=DB.videos.filter(v=>v.sectionId===s.id).sort((a,b)=>a.num-b.num);
+      if(!vids.length)return;
+      html+=`<div style="margin-bottom:1.25rem"><div style="font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:.5rem;padding:.35rem .6rem;background:var(--s2);border-radius:6px">${b.emoji||'📚'} ${b.name} › ${s.name}</div>`
+        +vids.map(v=>`<div class="mitem"><div class="mitem-info"><div class="mitem-name">${v.label} #${v.num}</div><div class="mitem-sub">${v.videoId?'ID: '+v.videoId:'PL: '+v.playlistId+' ['+v.playlistIndex+']'}</div></div>
+        <button class="btn btn-danger" style="padding:.3rem .7rem;font-size:.75rem" onclick="deleteVideo('${v.id}')">🗑</button></div>`).join('')+'</div>';
+    });
+  });
+  el.innerHTML=html||'<p style="color:var(--muted)">Video bulunamadı.</p>';
+}
+
+// ── SETTINGS ──
+function saveSiteName(){const n=document.getElementById('siteName').value.trim();if(!n)return;localStorage.setItem('vcz_sn',n);updateSiteNameDisplay();notif('✓ Kaydedildi');}
+function changePw(){
+  const p1=document.getElementById('pw1').value,p2=document.getElementById('pw2').value,msg=document.getElementById('pwMsg');
+  if(!p1){msg.style.display='block';msg.style.color='var(--danger)';msg.textContent='Şifre boş olamaz.';return;}
+  if(p1!==p2){msg.style.display='block';msg.style.color='var(--danger)';msg.textContent='Şifreler eşleşmiyor.';return;}
+  localStorage.setItem('vcz_pw',p1);msg.style.display='block';msg.style.color='var(--success)';msg.textContent='✓ Güncellendi.';
+  document.getElementById('pw1').value='';document.getElementById('pw2').value='';
+}
+async function nukeAll(){
+  if(!confirm('TÜMÜ silinecek. Emin misiniz?'))return;
+  DB={books:[],sections:[],videos:[]};await saveDB();
+  activeBook=null;activeSection=null;activeNum=null;
+  renderHome();renderManage();notif('🗑 Silindi','danger');
+}
+
+// ── NOTIF ──
+function notif(msg,type){
+  const n=document.getElementById('notif');
+  n.textContent=msg;
+  n.style.background=type==='danger'?'var(--danger)':'var(--success)';
+  n.style.color=type==='danger'?'#fff':'#080810';
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),2500);
+}
+
+init();
+</script>
+</body>
+</html>
